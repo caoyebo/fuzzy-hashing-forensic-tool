@@ -8,4 +8,11 @@ Carl Yu
 Yebo Cao
 
 Usage:
+
+
 python3 main.py --d <disk_image_path> -r <reference_image_folder> -i <optional difference threshold> -o [optional output folder]
+
+Example:
+
+
+![Image text](https://github.com/caoyebo/fuzzy-hashing-forensic-tool/blob/main/example.PNG)
