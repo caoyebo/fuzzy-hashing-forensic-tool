@@ -6,24 +6,9 @@ from dfvfs.lib import definitions
 from dfvfs.path import factory as path_spec_factory
 from dfvfs.resolver import resolver as path_spec_resolver
 from PIL import Image, ImageChops
-import imagehash
 import traceback
 from io import BytesIO
 import numpy as np
-from sklearn.neural_network import MLPClassifier
-import pickle
-
-ml_model = pickle.load(open('model.model', 'rb'))
-
-def extract_data(p1, p2):
-  return (int(str(imagehash.average_hash(p1)),16),
-          int(str(imagehash.phash(p1)),16), 
-          int(str(imagehash.whash(p1)),16),
-          int(str(imagehash.dhash(p1)),16),
-          int(str(imagehash.average_hash(p2)),16),
-          int(str(imagehash.phash(p2)),16), 
-          int(str(imagehash.whash(p2)),16),
-          int(str(imagehash.dhash(p2)),16))
 
 
 def img_similarity_check(img1, img2, similarity_threshold):
@@ -36,10 +21,13 @@ def img_similarity_check(img1, img2, similarity_threshold):
     """
 
     # pixel by pixel comparison
-    #print(ml_model.predict([extract_data(img1,img2)])[0])
-    is_similar = ml_model.predict([extract_data(img1,img2)])[0] == 1
+    diff = ImageChops.difference(img2, img1)
+    diff_array = np.array(diff)
+    mean_diff = np.mean(diff_array)
 
-    return is_similar, imagehash.phash(img1) - imagehash.phash(img2)
+    is_similar = mean_diff < similarity_threshold
+
+    return is_similar, mean_diff
 
 
 def find_similar_images(disk_img_path, reference_image_folder_path, similarity_threshold, result, output_folder):
